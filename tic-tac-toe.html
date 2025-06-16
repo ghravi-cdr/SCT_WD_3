@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic-Tac-Toe</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #fff67d;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #4169E1;
+      font-size: 3em;
+      text-shadow: 2px 2px #ffa;
+    }
+
+    .mode-toggle button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background-color: #ffefd5;
+      border: 2px dashed #8a2be2;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 8px;
+      justify-content: center;
+      margin: 30px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #f0fff0;
+      border: 4px dashed #20b2aa;
+      font-size: 3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cell:hover {
+      background-color: #ffe4e1;
+    }
+
+    #status {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #4682b4;
+    }
+
+    #reset-btn {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #f9c;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe 🎨</h1>
+  <div class="mode-toggle">
+    <button onclick="setMode('pvp')">👫 Player vs Player</button>
+    <button onclick="setMode('cpu')">🤖 Player vs Computer</button>
+  </div>
+  <div id="game-board"></div>
+  <div id="status"></div>
+  <button id="reset-btn" onclick="resetGame()">🔄 Play Again</button>
+
+  <script>
+    const board = [];
+    let currentPlayer = "X";
+    let gameOver = false;
+    let mode = "pvp"; // 'pvp' or 'cpu'
+
+    function createBoard() {
+      const gameBoard = document.getElementById("game-board");
+      gameBoard.innerHTML = "";
+      board.length = 0;
+      gameOver = false;
+      document.getElementById("status").textContent = `Player ${currentPlayer}'s turn`;
+      document.getElementById("reset-btn").style.display = "none";
+
+      for (let i = 0; i < 9; i++) {
+        board.push("");
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.addEventListener("click", handleClick);
+        gameBoard.appendChild(cell);
+      }
+    }
+
+    function handleClick(e) {
+      const index = e.target.dataset.index;
+
+      if (board[index] || gameOver) return;
+
+      board[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+
+      if (checkWin(currentPlayer)) {
+        document.getElementById("status").textContent = `🎉 Player ${currentPlayer} wins!`;
+        gameOver = true;
+        document.getElementById("reset-btn").style.display = "inline-block";
+        return;
+      }
+
+      if (!board.includes("")) {
+        document.getElementById("status").textContent = "😮 It's a draw!";
+        gameOver = true;
+        document.getElementById("reset-btn").style.display = "inline-block";
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      document.getElementById("status").textContent = `Player ${currentPlayer}'s turn`;
+
+      if (mode === "cpu" && currentPlayer === "O" && !gameOver) {
+        setTimeout(cpuMove, 500);
+      }
+    }
+
+    function cpuMove() {
+      let emptyIndexes = board.map((val, i) => val === "" ? i : null).filter(i => i !== null);
+      let move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
+      const cell = document.querySelector(`.cell[data-index='${move}']`);
+      handleClick({ target: cell });
+    }
+
+    function checkWin(player) {
+      const wins = [
+        [0,1,2], [3,4,5], [6,7,8], // rows
+        [0,3,6], [1,4,7], [2,5,8], // cols
+        [0,4,8], [2,4,6]           // diagonals
+      ];
+      return wins.some(comb => comb.every(i => board[i] === player));
+    }
+
+    function resetGame() {
+      currentPlayer = "X";
+      createBoard();
+    }
+
+    function setMode(selectedMode) {
+      mode = selectedMode;
+      resetGame();
+    }
+
+    // Initialize
+    window.onload = () => {
+      createBoard();
+    };
+  </script>
+</body>
+</html>
+
