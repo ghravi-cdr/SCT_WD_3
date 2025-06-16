@@ -1,2 +1,2 @@
-# SCT_WD_3
-Task3-A Tic-Tac-Toe web Game
+Created A Tic-Tac-Toe web Game using HTML, CSS and Java Script.
+
